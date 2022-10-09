@@ -3,21 +3,24 @@ const ejs = require("ejs");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv").config();
 const app = express();
-
+const encrypt = require("mongoose-encryption");
 // Environmental Variables
 PASSWORD = process.env.PASSWORD
 URL = process.env.URL
 PORT = process.env.PORT
+SECRETKEY = process.env.SECRET
 
 app.use(express.static("public"));
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 mongoose.connect("mongodb+srv://admin-dane:"+PASSWORD+"@"+URL);
 
-const userSchema = {
+const userSchema = new mongoose.Schema({
   email: String,
   password: String
-};
+});
+// adding encryption to password of schema
+userSchema.plugin(encrypt, { secret: SECRETKEY, encryptedFields: ['password'] });
 
 const User = new mongoose.model("User", userSchema);
 
